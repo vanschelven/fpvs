@@ -81,5 +81,17 @@ Upgrade to version 2.6.0 or above.
 FAILURE: Found 1 unsafe packages
 ```
 
+Or if you don't like reading:
+
+```
+$ fpvs-scan
+requests==2.0.1: 4 advisories
+Upgrade to version 2.20.0 or above.
+Upgrade to version 2.3.0 or above.
+Upgrade to version 2.6.0 or above.
+
+FAILURE: Found 1 unsafe packages
+```
+
 Note that the GitLab Advisory Database has a [licence that is separate from the
 FPVS](https://gitlab.com/gitlab-org/security-products/gemnasium-db/-/blob/master/LICENSE.md).
