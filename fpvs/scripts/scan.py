@@ -25,7 +25,7 @@ def scan(wheels_path, gemnasium_db_path, verbose=False):
             print(f"Not a directory: { directory }")
             exit(1)
 
-    failures = []
+    failures = {}
 
     for wheel_filename in glob.glob(f"{ wheels_path }/*.whl"):
         wheel_filename_short = os.path.basename(wheel_filename)
@@ -47,7 +47,10 @@ def scan(wheels_path, gemnasium_db_path, verbose=False):
                         f"ADVISORY { advisory_filename_short }: { wheel.version } against { affected_ranges }", end=" ")
 
                 if _match(wheel.version, affected_ranges):
-                    failures.append(advisory)
+                    if wheel.project not in failures:
+                        failures[wheel.project] = wheel.version, []
+                    _, advisories = failures[wheel.project]
+                    advisories.append(advisory)
                     if verbose:
                         print("FAIL")
                 else:
@@ -57,13 +60,27 @@ def scan(wheels_path, gemnasium_db_path, verbose=False):
     if failures and verbose:
         print()  # empty line for readability
 
-    for failure in failures:
-        for key in ["package_slug", "title", "description", "identifier", "solution"]:
-            print(failure[key])
+    for project, (version, advisories) in failures.items():
+        solutions = set()
+        print(f"{ project }=={ version }: { len(advisories) } advisories")
+        for i, advisory in enumerate(advisories):
+            if verbose:
+                print()
+                print(f"{ i + 1 }. { advisory['title'] }")
+                print(f"{ advisory['description'] }")
+                print(f"{ advisory['identifier'] }")
+            solutions.add(advisory["solution"])
+
+        if verbose:
+            print(f"\nSolutions (for { project }=={ version })")
+
+        for solution in sorted(solutions):
+            print(solution)
+
         print()
 
     if failures:
-        print(f"FAILURE: Found { len(failures) } advisories")
+        print(f"FAILURE: Found { len(failures) } unsafe packages")
         exit(1)
 
 
