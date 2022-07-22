@@ -48,38 +48,37 @@ Example output:
 fpvs-scan  --verbose
 Checking wheels in vendor against gemnasium-db
 SCANNING requests-2.0.1-py2.py3-none-any.whl
-ADVISORY pypi/requests/CVE-2014-1829.yml: 2.0.1 against <=2.2.1 FAIL
-ADVISORY pypi/requests/CVE-2013-2099.yml: 2.0.1 against <=1.0.3 OK
-ADVISORY pypi/requests/CVE-2018-18074.yml: 2.0.1 against <2.20.0 FAIL
 ADVISORY pypi/requests/GMS-2012-3.yml: 2.0.1 against <0.12.0 OK
 ADVISORY pypi/requests/CVE-2014-1830.yml: 2.0.1 against <=2.2.1 FAIL
+ADVISORY pypi/requests/CVE-2013-2099.yml: 2.0.1 against <=1.0.3 OK
 ADVISORY pypi/requests/CVE-2015-2296.yml: 2.0.1 against <2.6.0 FAIL
+ADVISORY pypi/requests/CVE-2014-1829.yml: 2.0.1 against <=2.2.1 FAIL
+ADVISORY pypi/requests/CVE-2018-18074.yml: 2.0.1 against <2.20.0 FAIL
 
-pypi/requests
-Information Exposure
-Requests (aka python-requests) allows remote servers to obtain a netrc password by reading the Authorization header in a redirected request.
-CVE-2014-1829
-Upgrade to version 2.3.0 or above.
+requests==2.0.1: 4 advisories
 
-pypi/requests
-Information exposure in HTTP headers
-The Requests package for Python sends an HTTP Authorization header to an HTTP URI upon receiving a same-hostname https-to-http redirect, which makes it easier for remote attackers to discover credentials by sniffing the network.
-CVE-2018-18074
-Upgrade to version 2.20.0 or above.
-
-pypi/requests
-Information Exposure
+1. Information Exposure
 Requests (aka python-requests) allows remote servers to obtain sensitive information by reading the Proxy-Authorization header in a redirected request.
 CVE-2014-1830
-Upgrade to version 2.3.0 or above.
 
-pypi/requests
-Session fixation in resolve_redirects()
+2. Session fixation in resolve_redirects()
 The `resolve_redirects()` function in `sessions.py` allows a remote, user-assisted attacker to conduct a session fixation attack. This flaw exists because the application, when establishing a new session, does not invalidate an existing session identifier and assign a new one. With a specially crafted request fixating the session identifier, a context-dependent attacker can ensure a user authenticates with the known session identifier, allowing the session to be subsequently hijacked.
 CVE-2015-2296
+
+3. Information Exposure
+Requests (aka python-requests) allows remote servers to obtain a netrc password by reading the Authorization header in a redirected request.
+CVE-2014-1829
+
+4. Information exposure in HTTP headers
+The Requests package for Python sends an HTTP Authorization header to an HTTP URI upon receiving a same-hostname https-to-http redirect, which makes it easier for remote attackers to discover credentials by sniffing the network.
+CVE-2018-18074
+
+Solutions (for requests==2.0.1)
+Upgrade to version 2.20.0 or above.
+Upgrade to version 2.3.0 or above.
 Upgrade to version 2.6.0 or above.
 
-FAILURE: Found 4 advisories
+FAILURE: Found 1 unsafe packages
 ```
 
 Note that the GitLab Advisory Database has a [licence that is separate from the
