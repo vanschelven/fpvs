@@ -2,7 +2,7 @@ import os
 import argparse
 import yaml
 import glob
-from packaging.specifiers import SpecifierSet
+from packaging.specifiers import SpecifierSet, InvalidSpecifier
 from packaging.version import Version
 from wheel_filename import parse_wheel_filename
 
@@ -11,12 +11,16 @@ from fpvs.__version__ import __version__
 
 def _match(version, affected_ranges):
     for affected_range in affected_ranges.split("||"):
-        if Version(version) in SpecifierSet(affected_range):
-            return True
+
+        try:
+            if Version(version) in SpecifierSet(affected_range):
+                return True
+        except InvalidSpecifier:
+            return None
     return False
 
 
-def scan(wheels_path, gemnasium_db_path, verbose=False):
+def scan(wheels_path, gemnasium_db_path, verbose=False, no_invalid_specifiers=False):
     if verbose:
         print(f"Checking wheels in { wheels_path } against { gemnasium_db_path }")
 
@@ -46,13 +50,25 @@ def scan(wheels_path, gemnasium_db_path, verbose=False):
                     print(
                         f"ADVISORY { advisory_filename_short }: { wheel.version } against { affected_ranges }", end=" ")
 
-                if _match(wheel.version, affected_ranges):
+                m = _match(wheel.version, affected_ranges)
+                if m:
                     if wheel.project not in failures:
                         failures[wheel.project] = wheel.version, []
                     _, advisories = failures[wheel.project]
                     advisories.append(advisory)
                     if verbose:
                         print("FAIL")
+                elif m is None:
+                    if verbose:
+                        print("INVALID SPECIFIER IN DB")
+
+                    if no_invalid_specifiers:
+                        if wheel.project not in failures:
+                            failures[wheel.project] = wheel.version, []
+                        _, advisories = failures[wheel.project]
+                        advisories.append(advisory)
+                        advisory["solution"] = "Solution unclear; could not parse specifier in db: " + affected_ranges
+
                 else:
                     if verbose:
                         print("OK")
@@ -90,6 +106,7 @@ def main():
     parser.add_argument("--gemnasium-db-path", help="Path to gemnasium-db", default="gemnasium-db", type=str)
     parser.add_argument("--version", help="Display version information", action="store_true")
     parser.add_argument("--verbose", default=False, action="store_true")
+    parser.add_argument("--no-invalid-specifiers", default=False, action="store_true")
 
     args = parser.parse_args()
 
@@ -97,4 +114,9 @@ def main():
         print(__version__)
         exit()
 
-    scan(args.wheels_path, args.gemnasium_db_path, verbose=args.verbose)
+    scan(
+        args.wheels_path,
+        args.gemnasium_db_path,
+        verbose=args.verbose,
+        no_invalid_specifiers=args.no_invalid_specifiers,
+    )

@@ -22,7 +22,7 @@ Why a single command, rather than a full blown Docker container?
    rather than doing yet another `pip install -r requirements.txt` in each job
    of your pipeline.
 
-usage: `fpvs-scan [-h] [--wheels-path WHEELS_PATH] [--gemnasium-db-path GEMNASIUM_DB_PATH] [--version] [--verbose]`
+usage: `fpvs-scan [-h] [--wheels-path WHEELS_PATH] [--gemnasium-db-path GEMNASIUM_DB_PATH] [--version] [--verbose] [--no-invalid-specifiers]`
 
 Example usage:
 
@@ -92,6 +92,8 @@ Upgrade to version 2.6.0 or above.
 
 FAILURE: Found 1 unsafe packages
 ```
+
+The GitLab Advisory Database may occasionally contain invalid version specifiers. If you want fpvs to fail in that scenario, run it with `--no-invalid-specifiers`.
 
 Note that the GitLab Advisory Database has a [licence that is separate from the
 FPVS](https://gitlab.com/gitlab-org/security-products/gemnasium-db/-/blob/master/LICENSE.md).
